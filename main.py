@@ -1,17 +1,15 @@
 from bs4 import BeautifulSoup
 import pandas as pd
-import request
+import requests
 
 url = "https://european-digital-innovation-hubs.ec.europa.eu/edih-catalogue/"
 
 # Main page data file:
-main_page_data = pd.read_xls("export-edihs.xls")
-
+main_page_data = pd.read_excel("/Users/gui/Desktop/Upwork/EDIH/export-edihs.xls")
 name_column = main_page_data["EDIH Name"]
 
-def get_links(name_column):
-  for i in len(name_column):
-    new_list = url.append(i)
-    return new_list
+url_list = [f"{url}{name}" for name in name_column]
+
+print(url_list)
 
 
