@@ -4,6 +4,7 @@ import requests
 import openpyxl
 
 
+
 def download_list():
     """
     uses link and bs4 to download xlsx with main page info
@@ -38,11 +39,8 @@ def get_clients(client_list):
     """
     df = pd.read_excel(f"{client_list}", index_col=None)
     df = df["EDIH Name"].tolist()
-    print(df)
+    return df
 
 
-if __name__ == '__main__':
-# call functions
-get_clients('clients.xlsx')
-download_list()
+get_clients("clients.xlsx")
 
