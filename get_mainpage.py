@@ -23,7 +23,7 @@ def download_list():
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while downloading the file: {e}")
 
-
+ #hier maken we een lijst van clienten
 def get_clients(client_list):
     df = pd.read_excel(f"{client_list}", index_col=None)
     df = df["EDIH Name"].tolist()
