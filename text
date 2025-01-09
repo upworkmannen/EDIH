@@ -1,0 +1,9 @@
+url = "https://european-digital-innovation-hubs.ec.europa.eu/edih-catalogue"
+step 1:
+scrape main page (download table)
+
+step 2:
+scrape all content on subpages
+
+step 3:
+merge tables and write proposal
