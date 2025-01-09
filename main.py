@@ -1,11 +1,44 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 import requests
+import os
+import random
+import time
+from get_mainpage import *
 
 url = "https://european-digital-innovation-hubs.ec.europa.eu/edih-catalogue/"
 
+headers_pool = [
+    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0"},
+    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:45.0) Gecko/20100101 Firefox/45.0"},
+    {"User-Agent": "Mozilla/5.0 (Linux; Android 9; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"},
+    {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"},
+    {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0"},
+    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko"},
+    {"User-Agent": "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"},
+    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0"},
+    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; Nexus 5 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/91.0.864.59"},
+    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
+    {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"},
+    {"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0"}
+]
+
+
+
+
+
 # Get list of all base links
-main_page_data = pd.read_excel("/Users/gui/Desktop/Upwork/EDIH/export-edihs.xls")
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+main_page_data = pd.read_excel(f"{__location__}\\clients.xlsx")
 name_column = main_page_data["EDIH Name"]
 url_list = [f"{url}{name}" for name in name_column] # Contains a list of all url's to scrape
 test_url = "https://european-digital-innovation-hubs.ec.europa.eu/edih-catalogue/4PDIH"
@@ -65,14 +98,11 @@ def extract_coordinator_info(soup):
 
 # Function to extract all contact information
 def extract_all_contact_info(soup):
-    contacts = [
-        extract_contact_info(soup, 'contractual', 'Contractual contact information'),
-        extract_contact_info(soup, 'co', 'Operational contact information')
-    ]
+    contacts = [extract_contact_info(soup, 'contractual', 'Contractual contact information'),
+                extract_contact_info(soup, 'co', 'Operational contact information'), extract_coordinator_info(soup)]
     
     # Add coordinator details to the list of contacts
-    contacts.append(extract_coordinator_info(soup))
-    
+
     return contacts
 
 # Function to combine all extracted data into one single pandas DataFrame
@@ -102,28 +132,7 @@ def extract_all_data(soup):
     return pd.DataFrame(all_data_df)
 
 ################################################
-    headers_pool = [
-    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0"},
-    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:45.0) Gecko/20100101 Firefox/45.0"},
-    {"User-Agent": "Mozilla/5.0 (Linux; Android 9; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"},
-    {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"},
-    {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0"},
-    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko"},
-    {"User-Agent": "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"},
-    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0"},
-    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; Nexus 5 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/91.0.864.59"},
-    {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"},
-    {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"},
-    {"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0"}
-]
+
 
 
 subpage = requests.get("https://european-digital-innovation-hubs.ec.europa.eu/edih-catalogue/4pdih")
@@ -177,22 +186,20 @@ df2 = get_table_contents(soup1)
 
 merged_df = pd.concat([df1, df2], axis=0, ignore_index=True)
 merged_df.to_csv('merged_data_EDIH.csv', index=False)
-# clients = get_clients("clients.xlsx")
 
 
 soup = BeautifulSoup(subpage.text, 'html.parser')
 
-print(get_table_contents(soup))
+clients = get_clients_links()
 
-
-# for client in clients:
-#     headers = random.choice(headers_pool)
-#     # sub = requests.get(f"https://european-digital-innovation-hubs.ec.europa.eu/edih-catalogue/{client}", headers=headers)
-#     print(sub.status_code)
-#     if sub.status_code == 429:
-#         print("Rate limit exceeded. Retrying with a new header...")
-#         time.sleep(1)  # Optional: Add a small delay before retrying
-#         continue  # Skip to the next iteration
-#     soup = BeautifulSoup(sub.text, 'html.parser')
-#     print(client)
-#     print(get_table_contents(soup))
+for client in clients:
+    print(client)
+    headers = random.choice(headers_pool)
+    sub = requests.get(f"https://european-digital-innovation-hubs.ec.europa.eu{client}", headers=headers)
+    print(sub.status_code)
+    if sub.status_code == 429:
+        print("Rate limit exceeded. Retrying with a new header...")
+        time.sleep(1)  # Optional: Add a small delay before retrying
+        continue  # Skip to the next iteration
+    soup = BeautifulSoup(sub.text, 'html.parser')
+    print(get_table_contents(soup))
