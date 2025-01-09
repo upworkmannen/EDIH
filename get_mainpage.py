@@ -29,7 +29,7 @@ def download_list():
         print(f"An error occurred while downloading the file: {e}")
 
 
-def get_clients(client_list):
+def get_clients_links():
     """
     :param client_list:
     This is the .xlsx file with the main page data
@@ -37,10 +37,11 @@ def get_clients(client_list):
     :return:
     returns a list of client names, for use in scraping individual pages
     """
-    df = pd.read_excel(f"{client_list}", index_col=None)
-    df = df["EDIH Name"].tolist()
-    return df
+    mainpage = requests.get("https://european-digital-innovation-hubs.ec.europa.eu/edih-catalogue/")
+    soup = BeautifulSoup(mainpage.text, "html.parser")
+    link = soup.find_all('td', CLASS={})
+    # print(link)
 
 
-get_clients("clients.xlsx")
+get_clients_links()
 
